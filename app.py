@@ -1,10 +1,10 @@
 import os
 import streamlit as st
-import openai
+from openai import OpenAI
 import uuid
 
 # OpenAI APIキー設定（環境変数OPENAI_API_KEY）
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_questions(cert: str, q_num: int, time_limit: int):
     """
@@ -25,8 +25,8 @@ def generate_questions(cert: str, q_num: int, time_limit: int):
 - 試験カテゴリ: {cert}
 - 制限時間: {time_limit}分
 """
-    res = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
+    res = client.chat.completions.create(
+        model="gpt-4",
         messages=[{"role":"user","content":prompt}],
         temperature=0.7,
         max_tokens=1500
