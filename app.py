@@ -13,13 +13,13 @@ def generate_questions(cert: str, q_num: int, time_limit: int):
     各問題：{id, question, choices:[…], answer_index, explanation}
     """
     prompt = f"""
-以下の試験情報に沿って、{q_num}問の択一式問題をJSONで生成してください。
+以下の試験情報に沿って、{q_num}問の日本語の択一式問題をJSONで生成してください。
 各問題オブジェクトは
   id: 一意のUUID文字列
-  question: 問題文
-  choices: 選択肢リスト（4つ）
+  question: 問題文（日本語）
+  choices: 選択肢リスト（4つ、日本語）
   answer_index: 正解の選択肢インデックス(0–3)
-  explanation: 解説（50–100字）
+  explanation: 解説（日本語、50–100字）
 形式：
 {{"questions":[{{…}},…]}}
 試験情報：
