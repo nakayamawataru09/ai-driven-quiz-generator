@@ -37,17 +37,21 @@ def generate_questions(cert: str, q_num: int, time_limit: int):
 
 st.title("資格模擬試験 — 問題生成")
 
-cert = st.selectbox("試験カテゴリ", ["AWS: Solutions Architect", "GCP: Data Engineer"])
-q_num = st.number_input("問題数", min_value=5, max_value=50, value=10, step=5)
-time_limit = st.number_input("制限時間（分）", min_value=5, max_value=60, value=20, step=5)
+# サイドバーに設定を移動
+with st.sidebar:
+    st.header("試験設定")
+    cert = st.selectbox("試験カテゴリ", ["AWS: Solutions Architect", "GCP: Data Engineer"])
+    q_num = st.number_input("問題数", min_value=5, max_value=50, value=10, step=5)
+    time_limit = st.number_input("制限時間（分）", min_value=5, max_value=60, value=20, step=5)
+    generate_button = st.button("問題生成", type="primary")
 
-if st.button("問題生成"):
+# メインコンテンツエリア
+if generate_button:
     with st.spinner("AIで問題を生成中…"):
         json_str = generate_questions(cert, q_num, time_limit)
     # 取得した JSON をパースして表示
     try:
         data = json.loads(json_str)  # JSON文字列をパース
-        st.json(data)  # JSONデータを表示
         for q in data["questions"]:
             st.markdown(f"**Q. {q['question']}**")
             for idx, c in enumerate(q["choices"]):
