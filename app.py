@@ -35,7 +35,7 @@ def generate_questions(cert: str, q_num: int, time_limit: int):
     content = res.choices[0].message.content
     return content  # JSON文字列
 
-st.title("資格模擬試験 — 問題生成")
+st.title("資格試験問題つくるん")
 
 # サイドバーに設定を移動
 with st.sidebar:
