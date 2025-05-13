@@ -25,6 +25,11 @@ client = OpenAI(api_key=openai_api_key)
 
 exam_info_table = dynamodb.Table('ExamInfo')
 
+def default_json(obj):
+    if isinstance(obj, (datetime.datetime, datetime.date)):
+        return obj.isoformat()
+    return str(obj)
+
 def get_all_exam_categories():
     """
     PKが'EXAM#'で始まり、SK='META'の全試験カテゴリを取得
@@ -70,7 +75,7 @@ def generate_questions(exam_id, exam_name, q_num, time_limit):
 
 試験名: {exam_name}
 試験の詳細情報:
-{json.dumps(exam_info, ensure_ascii=False, indent=2)}
+{json.dumps(exam_info, ensure_ascii=False, indent=2, default=default_json)}
 
 各問題オブジェクトは
   id: 一意のUUID文字列
