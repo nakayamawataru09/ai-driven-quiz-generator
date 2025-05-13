@@ -71,6 +71,7 @@ def generate_questions(exam_id, exam_name, q_num, time_limit):
     exam_info = get_exam_info(exam_id)
     prompt = f"""
 以下の試験情報に沿って、{q_num}問の日本語の択一式問題をJSONで生成してください。
+絶対に説明や補足を加えず、JSONのみを出力してください。
 また試験の難易度や出題傾向、問題文章量等のポイントを調べた上で問題を生成してください。
 
 試験名: {exam_name}
