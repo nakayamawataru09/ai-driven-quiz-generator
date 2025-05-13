@@ -4,7 +4,7 @@ from openai import OpenAI
 import uuid
 import json
 import boto3
-from datetime import datetime
+import datetime
 
 # Secretsから取得
 aws_access_key_id = st.secrets["AWS_ACCESS_KEY_ID"]
