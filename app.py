@@ -97,7 +97,12 @@ def generate_questions(exam_id, exam_name, q_num=5):
     )
     return res.choices[0].message.content
 
-st.title("Certify")
+# タイトルとアイコンの表示
+col1, col2 = st.columns([1, 5])
+with col1:
+    st.image("static/images/certify_logo.png", width=50)
+with col2:
+    st.title("Certify")
 
 # サイドバーに設定を移動
 with st.sidebar:
@@ -123,7 +128,7 @@ if 'questions' not in st.session_state:
 if 'current_page' not in st.session_state:
     st.session_state.current_page = 0
 if 'questions_per_page' not in st.session_state:
-    st.session_state.questions_per_page = 3
+    st.session_state.questions_per_page = 5
 if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
 
