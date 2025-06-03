@@ -98,22 +98,22 @@ def generate_questions(exam_id, exam_name, q_num=5):
     return res.choices[0].message.content
 
 # サイドバーに設定を移動
+st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 0rem !important;
+        margin-top: 0rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# サイドバーに設定を移動
 with st.sidebar:
-    st.markdown(
-        """
-        <style>
-        [data-testid='stSidebar'] > div:first-child {
-            padding-top: 0rem;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    col1, col2 = st.columns([1, 4])
-    with col1:
-        st.image("static/images/certify_logo.png", width=200)
-    with col2:
-        st.markdown("<h1 style='margin-bottom: 0; font-size: 2.8em;'>Certify</h1>", unsafe_allow_html=True)
+    st.image("static/images/certify_logo.png", width=200)
+    st.markdown("<h1 style='margin-bottom: 0; font-size: 2.8em;'>Certify</h1>", unsafe_allow_html=True)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
