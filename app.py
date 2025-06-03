@@ -139,18 +139,13 @@ if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
 
 # メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
-st.markdown(
-    f"""
-    <div style='display: flex; align-items: center; margin-bottom: 0;'>
-        <img src='static/images/certify_logo.png' width='60' style='margin-right: 16px;'>
-        <span style='font-size: 2.8em; font-weight: bold;'>Certify</span>
-    </div>
-    <div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>
-        {selected_exam_name if 'selected_exam_name' in locals() else "資格名"}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns([1, 6])
+with col1:
+    st.image("static/images/certify_logo.png", width=60)
+with col2:
+    st.markdown("<span style='font-size: 2.8em; font-weight: bold;'>Certify</span>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>"
+                f"{selected_exam_name if 'selected_exam_name' in locals() else '資格名'}</div>", unsafe_allow_html=True)
 
 # メインコンテンツエリア
 if generate_button:
