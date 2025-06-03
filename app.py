@@ -141,7 +141,7 @@ if 'review_flags' not in st.session_state:
 # メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
 col1, col2 = st.columns([1, 6])
 with col1:
-    st.image("static/images/certify_logo.png", width=60)
+    st.image("static/images/certify_logo.png", width=120)
 with col2:
     st.markdown("<span style='font-size: 2.8em; font-weight: bold;'>Certify</span>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>"
