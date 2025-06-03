@@ -102,7 +102,7 @@ with st.sidebar:
     st.markdown("<div style='margin-top: -40px'></div>", unsafe_allow_html=True)
     col1, col2 = st.columns([1, 4])
     with col1:
-        st.image("static/images/certify_logo.png", width=150)
+        st.image("static/images/certify_logo.png", width=200)
     with col2:
         st.markdown("<h1 style='margin-bottom: 0; font-size: 2.8em;'>Certify</h1>", unsafe_allow_html=True)
     st.header("試験設定")
