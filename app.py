@@ -112,9 +112,6 @@ st.markdown(
 
 # サイドバーに設定を移動
 with st.sidebar:
-    # st.write("")  # 上部スペース調整
-    st.image("static/images/certify_logo.png", width=160)
-    # st.markdown("<div style='text-align:center;'><span style='font-size:2.2em; font-weight:bold;'>Certify</span></div>", unsafe_allow_html=True)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
@@ -141,8 +138,19 @@ if 'questions_per_page' not in st.session_state:
 if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
 
-# メインページのタイトルを資格名称に
-st.title(selected_exam_name if 'selected_exam_name' in locals() else "資格名")
+# メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
+st.markdown(
+    f"""
+    <div style='display: flex; align-items: center; margin-bottom: 0;'>
+        <img src='static/images/certify_logo.png' width='60' style='margin-right: 16px;'>
+        <span style='font-size: 2.8em; font-weight: bold;'>Certify</span>
+    </div>
+    <div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>
+        {selected_exam_name if 'selected_exam_name' in locals() else "資格名"}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # メインコンテンツエリア
 if generate_button:
