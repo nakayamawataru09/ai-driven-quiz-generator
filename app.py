@@ -114,7 +114,7 @@ st.markdown(
 with st.sidebar:
     # st.write("")  # 上部スペース調整
     st.image("static/images/certify_logo.png", width=160)
-    st.markdown("<div style='text-align:center;'><span style='font-size:2.2em; font-weight:bold;'>Certify</span></div>", unsafe_allow_html=True)
+    # st.markdown("<div style='text-align:center;'><span style='font-size:2.2em; font-weight:bold;'>Certify</span></div>", unsafe_allow_html=True)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
