@@ -115,7 +115,7 @@ with st.sidebar:
     st.markdown(
         """
         <div style='display: flex; align-items: center;'>
-            <img src='static/images/certify_logo.png' width='60' style='margin-right: 16px;'>
+            <img src='static/images/certify_logo.png' width='160' style='margin-right: 16px;'>
         </div>
         """,
         unsafe_allow_html=True
