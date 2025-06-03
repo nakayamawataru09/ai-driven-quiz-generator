@@ -172,6 +172,13 @@ if st.session_state.questions:
     end_idx = min(start_idx + st.session_state.questions_per_page, len(questions))
     
     for q in questions[start_idx:end_idx]:
+        # バリデーション: choicesが4つ未満、またはanswer_indexが範囲外の場合はスキップ
+        if not isinstance(q.get("choices"), list) or len(q["choices"]) != 4:
+            st.warning("この問題は選択肢が4つではないためスキップされました。")
+            continue
+        if not isinstance(q.get("answer_index"), int) or not (0 <= q["answer_index"] < 4):
+            st.warning("この問題は正解インデックスが不正なためスキップされました。")
+            continue
         st.markdown(f"**Q. {q['question']}**")
         
         # 選択肢を表示（デフォルト選択なし）
