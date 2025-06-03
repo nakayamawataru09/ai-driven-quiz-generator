@@ -112,14 +112,8 @@ st.markdown(
 
 # サイドバーに設定を移動
 with st.sidebar:
-    st.markdown(
-        """
-        <div style='display: flex; justify-content: center; align-items: center; width: 100%;'>
-            <img src='static/images/certify_logo.png' width='160'>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.write("")  # 上部スペース調整
+    st.image("static/images/certify_logo.png", width=160)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
