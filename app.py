@@ -64,7 +64,7 @@ def get_exam_info(exam_id):
         st.error(f"試験情報の取得に失敗しました: {e}")
         return {}
 
-def generate_questions(exam_id, exam_name, q_num, time_limit):
+def generate_questions(exam_id, exam_name, q_num=5):
     """
     AI にプロンプトを投げて JSON 形式で問題リストを取得する
     """
@@ -114,6 +114,11 @@ with st.sidebar:
     selected_exam_name = st.selectbox("試験カテゴリ", exam_names)
     # 選択されたexam_nameからexam_idを取得
     selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
+    
+    # 問題数と制限時間の設定を追加
+    q_num = st.number_input("問題数", min_value=1, max_value=10, value=5)
+    time_limit = st.number_input("制限時間（分）", min_value=5, max_value=60, value=15)
+    
     generate_button = st.button("問題生成", type="primary")
 
 # メインコンテンツエリア
@@ -121,7 +126,9 @@ if generate_button:
     with st.spinner("AIで問題を生成中…"):
         json_str = generate_questions(
             selected_exam["exam_id"],
-            selected_exam["exam_name"]
+            selected_exam["exam_name"],
+            q_num,
+            time_limit
         )
     # 取得した JSON をパースして表示
     try:
