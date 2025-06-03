@@ -99,7 +99,16 @@ def generate_questions(exam_id, exam_name, q_num=5):
 
 # サイドバーに設定を移動
 with st.sidebar:
-    st.markdown("<div style='margin-top: -10000px'></div>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <style>
+        [data-testid='stSidebar'] > div:first-child {
+            padding-top: 0rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     col1, col2 = st.columns([1, 4])
     with col1:
         st.image("static/images/certify_logo.png", width=200)
