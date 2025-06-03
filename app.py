@@ -130,10 +130,23 @@ if generate_button:
         data = json.loads(json_str)  # JSON文字列をパース
         for q in data["questions"]:
             st.markdown(f"**Q. {q['question']}**")
-            for idx, c in enumerate(q["choices"]):
-                st.radio("", c, key=f"{q['id']}_{idx}")
-            # 解説は折りたたみ
-            with st.expander("解説"):
-                st.write(q["explanation"])
+            
+            # 選択肢を表示
+            selected_choice = st.radio("", q["choices"], key=f"{q['id']}")
+            
+            # 選択された場合のみ回答を表示
+            if selected_choice:
+                selected_index = q["choices"].index(selected_choice)
+                is_correct = selected_index == q["answer_index"]
+                
+                # 正解/不正解の表示
+                if is_correct:
+                    st.success("正解です！")
+                else:
+                    st.error(f"不正解です。正解は: {q['choices'][q['answer_index']]}")
+                
+                # 解説は折りたたみ
+                with st.expander("解説"):
+                    st.write(q["explanation"])
     except Exception as e:
         st.error(f"JSONパースエラー: {e}")
