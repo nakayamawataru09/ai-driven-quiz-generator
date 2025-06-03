@@ -117,6 +117,10 @@ with st.sidebar:
     
     generate_button = st.button("問題生成", type="primary")
 
+# セッション状態の初期化
+if 'questions' not in st.session_state:
+    st.session_state.questions = None
+
 # メインコンテンツエリア
 if generate_button:
     with st.spinner("AIで問題を生成中…"):
@@ -125,28 +129,30 @@ if generate_button:
             selected_exam["exam_name"],
             q_num=5
         )
-    # 取得した JSON をパースして表示
-    try:
-        data = json.loads(json_str)  # JSON文字列をパース
-        for q in data["questions"]:
-            st.markdown(f"**Q. {q['question']}**")
+        # 生成した問題をセッション状態に保存
+        st.session_state.questions = json.loads(json_str)
+
+# 問題の表示（セッション状態から）
+if st.session_state.questions:
+    for q in st.session_state.questions["questions"]:
+        st.markdown(f"**Q. {q['question']}**")
+        
+        # 選択肢を表示
+        selected_choice = st.radio("", q["choices"], key=f"{q['id']}")
+        
+        # 選択された場合のみ回答を表示
+        if selected_choice:
+            selected_index = q["choices"].index(selected_choice)
+            is_correct = selected_index == q["answer_index"]
             
-            # 選択肢を表示
-            selected_choice = st.radio("", q["choices"], key=f"{q['id']}")
+            # 正解/不正解の表示
+            if is_correct:
+                st.success("正解です！")
+            else:
+                st.error(f"不正解です。正解は: {q['choices'][q['answer_index']]}")
             
-            # 選択された場合のみ回答を表示
-            if selected_choice:
-                selected_index = q["choices"].index(selected_choice)
-                is_correct = selected_index == q["answer_index"]
-                
-                # 正解/不正解の表示
-                if is_correct:
-                    st.success("正解です！")
-                else:
-                    st.error(f"不正解です。正解は: {q['choices'][q['answer_index']]}")
-                
-                # 解説は折りたたみ
-                with st.expander("解説"):
-                    st.write(q["explanation"])
-    except Exception as e:
-        st.error(f"JSONパースエラー: {e}")
+            # 解説は折りたたみ
+            with st.expander("解説"):
+                st.write(q["explanation"])
+        
+        st.markdown("---")  # 問題間の区切り線
