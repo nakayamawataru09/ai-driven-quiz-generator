@@ -126,6 +126,9 @@ with st.sidebar:
     # 選択されたexam_nameからexam_idを取得
     selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
     
+    # 問題数の選択（5～30）
+    q_num = st.slider("問題数", min_value=5, max_value=30, value=5)
+    
     generate_button = st.button("問題生成", type="primary")
 
 # セッション状態の初期化
@@ -141,7 +144,7 @@ if 'review_flags' not in st.session_state:
 # メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
 col1, col2 = st.columns([1, 6])
 with col1:
-    st.image("static/images/certify_logo.png", width=120)
+    st.image("static/images/certify_logo.png", width=60)
 with col2:
     st.markdown("<span style='font-size: 2.8em; font-weight: bold;'>Certify</span>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>"
@@ -153,7 +156,7 @@ if generate_button:
         json_str = generate_questions(
             selected_exam["exam_id"],
             selected_exam["exam_name"],
-            q_num=5
+            q_num=q_num
         )
         # 生成した問題をセッション状態に保存
         st.session_state.questions = json.loads(json_str)
