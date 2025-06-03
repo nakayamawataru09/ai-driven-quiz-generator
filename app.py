@@ -126,9 +126,6 @@ with st.sidebar:
     # 選択されたexam_nameからexam_idを取得
     selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
     
-    # 問題数の選択（5～30）
-    q_num = st.slider("問題数", min_value=5, max_value=30, value=5)
-    
     generate_button = st.button("問題生成", type="primary")
 
 # セッション状態の初期化
@@ -156,7 +153,7 @@ if generate_button:
         json_str = generate_questions(
             selected_exam["exam_id"],
             selected_exam["exam_name"],
-            q_num=q_num
+            q_num=5
         )
         # 生成した問題をセッション状態に保存
         st.session_state.questions = json.loads(json_str)
