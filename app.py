@@ -83,12 +83,11 @@ def generate_questions(exam_id, exam_name, q_num, time_limit):
   question: 問題文（日本語）
   choices: 選択肢リスト（4つ、日本語）
   answer_index: 正解の選択肢インデックス(0–3)
-  explanation: 解説（日本語、50–100字）
+  explanation: 解説（日本語、300字以内）どの選択肢が正解かを明確に示してください。
 形式：
 {{"questions":[{{…}},…]}}
 試験情報：
 - 試験ID: {exam_id}
-- 制限時間: {time_limit}分
 """
     res = client.chat.completions.create(
         model="gpt-4",
@@ -98,7 +97,7 @@ def generate_questions(exam_id, exam_name, q_num, time_limit):
     )
     return res.choices[0].message.content
 
-st.title("資格試験問題つくるん")
+st.title("Certify")
 
 # サイドバーに設定を移動
 with st.sidebar:
@@ -115,8 +114,6 @@ with st.sidebar:
     selected_exam_name = st.selectbox("試験カテゴリ", exam_names)
     # 選択されたexam_nameからexam_idを取得
     selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
-    q_num = st.number_input("問題数", min_value=5, max_value=50, value=10, step=5)
-    time_limit = st.number_input("制限時間（分）", min_value=5, max_value=60, value=20, step=5)
     generate_button = st.button("問題生成", type="primary")
 
 # メインコンテンツエリア
@@ -124,9 +121,7 @@ if generate_button:
     with st.spinner("AIで問題を生成中…"):
         json_str = generate_questions(
             selected_exam["exam_id"],
-            selected_exam["exam_name"],
-            q_num,
-            time_limit
+            selected_exam["exam_name"]
         )
     # 取得した JSON をパースして表示
     try:
