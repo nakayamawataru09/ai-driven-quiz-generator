@@ -127,7 +127,7 @@ if generate_button:
         json_str = generate_questions(
             selected_exam["exam_id"],
             selected_exam["exam_name"],
-            q_num=5
+            q_num=3
         )
         # 生成した問題をセッション状態に保存
         st.session_state.questions = json.loads(json_str)
@@ -137,8 +137,8 @@ if st.session_state.questions:
     for q in st.session_state.questions["questions"]:
         st.markdown(f"**Q. {q['question']}**")
         
-        # 選択肢を表示
-        selected_choice = st.radio("", q["choices"], key=f"{q['id']}")
+        # 選択肢を表示（デフォルト選択なし）
+        selected_choice = st.radio("", q["choices"], key=f"{q['id']}", index=None)
         
         # 選択された場合のみ回答を表示
         if selected_choice:
