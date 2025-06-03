@@ -115,10 +115,6 @@ with st.sidebar:
     # 選択されたexam_nameからexam_idを取得
     selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
     
-    # 問題数と制限時間の設定を追加
-    q_num = st.number_input("問題数", min_value=1, max_value=10, value=5)
-    time_limit = st.number_input("制限時間（分）", min_value=5, max_value=60, value=15)
-    
     generate_button = st.button("問題生成", type="primary")
 
 # メインコンテンツエリア
@@ -127,8 +123,7 @@ if generate_button:
         json_str = generate_questions(
             selected_exam["exam_id"],
             selected_exam["exam_name"],
-            q_num,
-            time_limit
+            q_num=5
         )
     # 取得した JSON をパースして表示
     try:
