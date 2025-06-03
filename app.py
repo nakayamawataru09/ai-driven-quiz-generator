@@ -102,9 +102,9 @@ with st.sidebar:
     # アイコンとアプリ名をサイドバーの一番上に配置
     col1, col2 = st.columns([1, 4])
     with col1:
-        st.image("static/images/certify_logo.png", width=80)
+        st.image("static/images/certify_logo.png", width=120)
     with col2:
-        st.markdown("<h2 style='margin-bottom: 0;'>Certify</h2>", unsafe_allow_html=True)
+        st.markdown("<h1 style='margin-bottom: 0; font-size: 2.8em;'>Certify</h1>", unsafe_allow_html=True)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
