@@ -138,7 +138,6 @@ if generate_button:
         # 生成した問題をセッション状態に保存
         st.session_state.questions = json.loads(json_str)
         st.session_state.current_page = 0  # ページをリセット
-        st.session_state.review_flags = {}  # 見直しフラグをリセット
 
 # 問題の表示（セッション状態から）
 if st.session_state.questions:
@@ -150,17 +149,7 @@ if st.session_state.questions:
     end_idx = min(start_idx + st.session_state.questions_per_page, len(questions))
     
     for q in questions[start_idx:end_idx]:
-        # 問題文と見直しボタンを横並びに
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.markdown(f"**Q. {q['question']}**")
-        with col2:
-            # 見直しフラグの状態を取得
-            is_review = st.session_state.review_flags.get(q['id'], False)
-            # 見直しボタン
-            if st.button("見直し" if not is_review else "✓ 見直し済", key=f"review_{q['id']}"):
-                st.session_state.review_flags[q['id']] = not is_review
-                st.rerun()
+        st.markdown(f"**Q. {q['question']}**")
         
         # 選択肢を表示（デフォルト選択なし）
         selected_choice = st.radio("", q["choices"], key=f"{q['id']}", index=None)
@@ -181,13 +170,6 @@ if st.session_state.questions:
                 st.write(q["explanation"])
         
         st.markdown("---")  # 問題間の区切り線
-    
-    # 見直しが必要な問題の一覧を表示
-    review_questions = [q for q in questions if st.session_state.review_flags.get(q['id'], False)]
-    if review_questions:
-        st.markdown("### 見直しが必要な問題")
-        for q in review_questions:
-            st.markdown(f"- Q. {q['question']}")
     
     # ページネーションコントロール
     col1, col2, col3 = st.columns([1, 2, 1])
