@@ -97,15 +97,14 @@ def generate_questions(exam_id, exam_name, q_num=5):
     )
     return res.choices[0].message.content
 
-# タイトルとアイコンの表示
-col1, col2 = st.columns([1, 5])
-with col1:
-    st.image("static/images/certify_logo.png", width=50)
-with col2:
-    st.title("Certify")
-
 # サイドバーに設定を移動
 with st.sidebar:
+    # アイコンとアプリ名をサイドバーの一番上に配置
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        st.image("static/images/certify_logo.png", width=80)
+    with col2:
+        st.markdown("<h2 style='margin-bottom: 0;'>Certify</h2>", unsafe_allow_html=True)
     st.header("試験設定")
     
     # DynamoDBから試験カテゴリを取得
@@ -131,6 +130,9 @@ if 'questions_per_page' not in st.session_state:
     st.session_state.questions_per_page = 5
 if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
+
+# メインページのタイトルを資格名称に
+st.title(selected_exam_name if 'selected_exam_name' in locals() else "資格名")
 
 # メインコンテンツエリア
 if generate_button:
