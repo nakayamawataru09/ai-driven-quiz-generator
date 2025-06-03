@@ -139,7 +139,7 @@ if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
 
 # メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
-col1, col2 = st.columns([2, 6])
+col1, col2 = st.columns([1, 6])
 with col1:
     st.image("static/images/certify_logo.png", width=120)
 with col2:
