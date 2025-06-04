@@ -5,6 +5,7 @@ import uuid
 import json
 import boto3
 import datetime
+from strands import Agent
 
 # Secretsから取得
 aws_access_key_id = st.secrets["AWS_ACCESS_KEY_ID"]
@@ -22,6 +23,9 @@ dynamodb = boto3.resource(
 
 # OpenAIの初期化
 client = OpenAI(api_key=openai_api_key)
+
+# Strandsエージェントの初期化
+agent = Agent()
 
 exam_info_table = dynamodb.Table('ExamInfo')
 
@@ -112,21 +116,29 @@ st.markdown(
 
 # サイドバーに設定を移動
 with st.sidebar:
-    st.header("試験設定")
-    
-    # DynamoDBから試験カテゴリを取得
-    exam_categories = get_all_exam_categories()
-    if not exam_categories:
-        st.error("試験カテゴリが見つかりません。DynamoDBに試験情報を登録してください。")
-        st.stop()
-    
-    # exam_nameのみのリストを作成
-    exam_names = [item['exam_name'] for item in exam_categories]
-    selected_exam_name = st.selectbox("試験カテゴリ", exam_names)
-    # 選択されたexam_nameからexam_idを取得
-    selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
-    
-    generate_button = st.button("問題生成", type="primary")
+    menu = st.radio("メニュー", ["問題", "アシスタント"])
+    if menu == "クイズ":
+        st.header("試験設定")
+        # DynamoDBから試験カテゴリを取得
+        exam_categories = get_all_exam_categories()
+        if not exam_categories:
+            st.error("試験カテゴリが見つかりません。DynamoDBに試験情報を登録してください。")
+            st.stop()
+        
+        # exam_nameのみのリストを作成
+        exam_names = [item['exam_name'] for item in exam_categories]
+        selected_exam_name = st.selectbox("試験カテゴリ", exam_names)
+        # 選択されたexam_nameからexam_idを取得
+        selected_exam = next(item for item in exam_categories if item['exam_name'] == selected_exam_name)
+        
+        generate_button = st.button("問題生成", type="primary")
+    else:
+        st.header("AIアシスタント")
+        user_message = st.text_area("質問を入力してください")
+        if st.button("送信") and user_message:
+            with st.spinner("AIが回答中..."):
+                response = agent(user_message)
+            st.write(response)
 
 # セッション状態の初期化
 if 'questions' not in st.session_state:
@@ -139,78 +151,80 @@ if 'review_flags' not in st.session_state:
     st.session_state.review_flags = {}
 
 # メインページのタイトル部分にアイコン＋Certify、その下に試験名（サブタイトル）を表示
-col1, col2 = st.columns([1, 6])
-with col1:
-    st.image("static/images/certify_logo.png", width=120)
-with col2:
-    st.markdown("<span style='font-size: 2.8em; font-weight: bold;'>Certify</span>", unsafe_allow_html=True)
-    st.markdown(f"<div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>"
-                f"{selected_exam_name if 'selected_exam_name' in locals() else '資格名'}</div>", unsafe_allow_html=True)
+if menu == "クイズ":
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.image("static/images/certify_logo.png", width=120)
+    with col2:
+        st.markdown("<span style='font-size: 2.8em; font-weight: bold;'>Certify</span>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 1.5em; color: #666; margin-bottom: 1.5em;'>"
+                    f"{selected_exam_name if 'selected_exam_name' in locals() else '資格名'}</div>", unsafe_allow_html=True)
 
 # メインコンテンツエリア
-if generate_button:
-    with st.spinner("AIで問題を生成中…"):
-        json_str = generate_questions(
-            selected_exam["exam_id"],
-            selected_exam["exam_name"],
-            q_num=5
-        )
-        # 生成した問題をセッション状態に保存
-        st.session_state.questions = json.loads(json_str)
-        st.session_state.current_page = 0  # ページをリセット
+if menu == "クイズ":
+    if generate_button:
+        with st.spinner("AIで問題を生成中…"):
+            json_str = generate_questions(
+                selected_exam["exam_id"],
+                selected_exam["exam_name"],
+                q_num=5
+            )
+            # 生成した問題をセッション状態に保存
+            st.session_state.questions = json.loads(json_str)
+            st.session_state.current_page = 0  # ページをリセット
 
-# 問題の表示（セッション状態から）
-if st.session_state.questions:
-    questions = st.session_state.questions["questions"]
-    total_pages = (len(questions) + st.session_state.questions_per_page - 1) // st.session_state.questions_per_page
-    
-    # 現在のページの問題を表示
-    start_idx = st.session_state.current_page * st.session_state.questions_per_page
-    end_idx = min(start_idx + st.session_state.questions_per_page, len(questions))
-    
-    for q in questions[start_idx:end_idx]:
-        # バリデーション: choicesが4つ未満、またはanswer_indexが範囲外の場合はスキップ
-        if not isinstance(q.get("choices"), list) or len(q["choices"]) != 4:
-            st.warning("この問題は選択肢が4つではないためスキップされました。")
-            continue
-        if not isinstance(q.get("answer_index"), int) or not (0 <= q["answer_index"] < 4):
-            st.warning("この問題は正解インデックスが不正なためスキップされました。")
-            continue
-        st.markdown(f"**Q. {q['question']}**")
+    # 問題の表示（セッション状態から）
+    if st.session_state.questions:
+        questions = st.session_state.questions["questions"]
+        total_pages = (len(questions) + st.session_state.questions_per_page - 1) // st.session_state.questions_per_page
         
-        # 選択肢を表示（デフォルト選択なし）
-        selected_choice = st.radio("", q["choices"], key=f"{q['id']}", index=None)
+        # 現在のページの問題を表示
+        start_idx = st.session_state.current_page * st.session_state.questions_per_page
+        end_idx = min(start_idx + st.session_state.questions_per_page, len(questions))
         
-        # 選択された場合のみ回答を表示
-        if selected_choice:
-            selected_index = q["choices"].index(selected_choice)
-            is_correct = selected_index == q["answer_index"]
+        for q in questions[start_idx:end_idx]:
+            # バリデーション: choicesが4つ未満、またはanswer_indexが範囲外の場合はスキップ
+            if not isinstance(q.get("choices"), list) or len(q["choices"]) != 4:
+                st.warning("この問題は選択肢が4つではないためスキップされました。")
+                continue
+            if not isinstance(q.get("answer_index"), int) or not (0 <= q["answer_index"] < 4):
+                st.warning("この問題は正解インデックスが不正なためスキップされました。")
+                continue
+            st.markdown(f"**Q. {q['question']}**")
             
-            # 正解/不正解の表示
-            if is_correct:
-                st.success("正解です！")
-            else:
-                st.error(f"不正解です。正解は: {q['choices'][q['answer_index']]}")
+            # 選択肢を表示（デフォルト選択なし）
+            selected_choice = st.radio("", q["choices"], key=f"{q['id']}", index=None)
             
-            # 解説は折りたたみ
-            with st.expander("解説"):
-                st.write(q["explanation"])
+            # 選択された場合のみ回答を表示
+            if selected_choice:
+                selected_index = q["choices"].index(selected_choice)
+                is_correct = selected_index == q["answer_index"]
+                
+                # 正解/不正解の表示
+                if is_correct:
+                    st.success("正解です！")
+                else:
+                    st.error(f"不正解です。正解は: {q['choices'][q['answer_index']]}")
+                
+                # 解説は折りたたみ
+                with st.expander("解説"):
+                    st.write(q["explanation"])
+            
+            st.markdown("---")  # 問題間の区切り線
         
-        st.markdown("---")  # 問題間の区切り線
-    
-    # ページネーションコントロール
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown(f"**ページ {st.session_state.current_page + 1} / {total_pages}**")
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col1:
-        if st.session_state.current_page > 0:
-            if st.button("前へ"):
-                st.session_state.current_page -= 1
-                st.rerun()
-    with col3:
-        if st.session_state.current_page < total_pages - 1:
-            if st.button("次へ"):
-                st.session_state.current_page += 1
-                st.rerun()
+        # ページネーションコントロール
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown(f"**ページ {st.session_state.current_page + 1} / {total_pages}**")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col1:
+            if st.session_state.current_page > 0:
+                if st.button("前へ"):
+                    st.session_state.current_page -= 1
+                    st.rerun()
+        with col3:
+            if st.session_state.current_page < total_pages - 1:
+                if st.button("次へ"):
+                    st.session_state.current_page += 1
+                    st.rerun()
