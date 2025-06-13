@@ -5,7 +5,7 @@ import uuid
 import json
 import boto3
 import datetime
-from strands import Agent
+# from strands import Agent
 
 # Secretsから取得
 aws_access_key_id = st.secrets["AWS_ACCESS_KEY_ID"]
